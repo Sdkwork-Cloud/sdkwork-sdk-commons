@@ -1,0 +1,46 @@
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs/temp
+*.log
+*.tmp
+*.temp
+
+# Node/TypeScript
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Java/Kotlin/Gradle
+.gradle/
+build/
+out/
+*.class
+
+# Maven
+target/
+
+# Go
+*.test
+
+# .NET
+bin/
+obj/
+
+# Flutter/Dart
+.dart_tool/
+.packages
+pubspec.lock
+

@@ -1,0 +1,14 @@
+name: sdkwork_common_flutter
+description: SDKwork common foundation library for Flutter/Dart SDKs.
+version: 1.0.0
+homepage: https://github.com/sdkwork/spring-ai-plus
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  http: ^1.1.0
+
+dev_dependencies:
+  test: ^1.24.0
+  lints: ^3.0.0
