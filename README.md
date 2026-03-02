@@ -62,6 +62,36 @@ sdkwork-sdk-commons/
 - [Flutter](./sdkwork-sdk-common-flutter/README.md)
 - [C#](./sdkwork-sdk-common-csharp/README.md)
 
+## Publish Standard (Per Language `bin`)
+
+Each language directory includes:
+
+- `bin/publish-core.mjs` (shared cross-platform publish core)
+- `bin/publish.sh` (Linux/macOS entrypoint)
+- `bin/publish.ps1` (Windows/PowerShell entrypoint)
+
+Example:
+
+```bash
+cd sdk/sdkwork-sdk-commons/sdkwork-sdk-common-typescript
+./bin/publish.sh --action check
+./bin/publish.sh --action publish --channel release
+```
+
+```powershell
+cd sdk/sdkwork-sdk-commons/sdkwork-sdk-common-java
+.\bin\publish.ps1 --action publish --channel test --dry-run
+```
+
+Target publish ecosystems:
+
+- TypeScript -> npm
+- Python -> PyPI/TestPyPI
+- Java/Kotlin -> Maven Central compatible publishing
+- C# -> NuGet
+- Flutter -> pub.dev
+- Go/Swift -> git tag based release flow
+
 ## Compatibility Notes
 
 - Generated SDKs should consume the matching language common package.
