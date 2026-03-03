@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
@@ -166,6 +166,41 @@ function loadJson(filePath) {
   }
 }
 
+function parsePatchVersion(version) {
+  if (typeof version !== 'string') {
+    fail('Invalid package version: ' + String(version));
+  }
+  const match = version.trim().match(/^(\d+)\.(\d+)\.(\d+)(?:[-+].*)?$/);
+  if (!match) {
+    fail('Unsupported version format: ' + version + '. Expected semver, for example 1.0.1');
+  }
+  return {
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3]),
+  };
+}
+
+function bumpPatchVersion(version) {
+  const parsed = parsePatchVersion(version);
+  return parsed.major + '.' + parsed.minor + '.' + (parsed.patch + 1);
+}
+
+function autoBumpNpmVersion(projectDir) {
+  const packageFile = path.join(projectDir, 'package.json');
+  ensureFile(packageFile, 'package.json');
+  const packageJson = loadJson(packageFile);
+  const currentVersion = String(packageJson.version || '').trim();
+  if (!currentVersion) {
+    fail('package.json missing version field: ' + packageFile);
+  }
+  const nextVersion = bumpPatchVersion(currentVersion);
+  packageJson.version = nextVersion;
+  writeFileSync(packageFile, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8');
+  log('Auto bumped npm version: ' + currentVersion + ' -> ' + nextVersion);
+  return { currentVersion, nextVersion };
+}
+
 function resolvePythonCommand() {
   const preferred = process.env.PYTHON_BIN || '';
   const candidates = preferred ? [preferred] : ['python3', 'python'];
@@ -222,6 +257,12 @@ function runTypeScript(ctx) {
 
   if (ctx.action === 'build') {
     return;
+  }
+
+  if (!ctx.dryRun) {
+    autoBumpNpmVersion(ctx.projectDir);
+  } else {
+    log('Dry run enabled: skipped version bump.');
   }
 
   const registry = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/';
