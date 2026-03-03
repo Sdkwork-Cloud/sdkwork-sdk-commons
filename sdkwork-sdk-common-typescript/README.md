@@ -22,8 +22,7 @@ Choose one mode per client instance.
 ## Quick Start
 
 ```typescript
-import { createBaseHttpClient } from '@sdkwork/sdk-common/http';
-import { createTokenManager } from '@sdkwork/sdk-common';
+import { createBaseHttpClient, createTokenManager } from '@sdkwork/sdk-common';
 
 const tokenManager = createTokenManager({
   accessToken: 'your-access-token',
@@ -42,7 +41,7 @@ console.log(profile.name);
 API key mode example:
 
 ```typescript
-import { createBaseHttpClient } from '@sdkwork/sdk-common/http';
+import { createBaseHttpClient } from '@sdkwork/sdk-common';
 
 const client = createBaseHttpClient({
   baseUrl: 'https://api.example.com',

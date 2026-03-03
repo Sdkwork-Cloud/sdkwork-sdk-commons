@@ -88,5 +88,12 @@ export {
 
 export type { ErrorCode, ErrorDetail } from './errors';
 
-export { BaseHttpClient } from './http';
-export type { HttpClientOptions } from './http';
+export { BaseHttpClient, createBaseHttpClient } from './http';
+export type {
+  HttpClientOptions,
+  HttpClientAuthConfig,
+  RequestExecutor,
+  ResponseProcessor,
+  UrlBuilder,
+  HeaderBuilder,
+} from './http';
