@@ -24,9 +24,10 @@
     "exactOptionalPropertyTypes": false,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
-    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "types": ["node"],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"],

@@ -2,7 +2,11 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
 
-export type QueryParams = Record<string, string | number | boolean | undefined | null>;
+export type QueryParamScalar = string | number | boolean | undefined | null;
+
+export type QueryParamValue = QueryParamScalar | Array<string | number | boolean>;
+
+export type QueryParams = Record<string, QueryParamValue>;
 
 export interface HttpHeaders extends Record<string, string> {}
 

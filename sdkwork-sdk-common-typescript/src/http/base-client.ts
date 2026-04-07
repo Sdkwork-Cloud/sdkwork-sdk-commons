@@ -235,6 +235,14 @@ export abstract class BaseHttpClient implements RequestExecutor {
     if (params) {
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            if (item !== undefined && item !== null) {
+              searchParams.append(key, String(item));
+            }
+          });
+          return;
+        }
         if (value !== undefined && value !== null) {
           searchParams.append(key, String(value));
         }
