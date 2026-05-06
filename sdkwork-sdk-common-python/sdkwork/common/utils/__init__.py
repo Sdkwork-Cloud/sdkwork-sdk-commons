@@ -1,10 +1,9 @@
-from typing import Any, Optional, Callable, Dict
-import time
+from typing import Any, Callable, Dict, Optional
 import logging
+import time
 from functools import wraps
-from datetime import datetime, timedelta
 
-from .types import (
+from ..core.types import (
     RetryConfig,
     RetryBackoff,
     CacheConfig,
@@ -13,7 +12,7 @@ from .types import (
     DEFAULT_CACHE_CONFIG,
     DEFAULT_LOGGER_CONFIG,
 )
-from .errors import SdkError, is_retryable_error
+from ..errors import is_retryable_error
 
 
 def with_retry(
@@ -33,6 +32,8 @@ def with_retry(
                 if attempt >= cfg.max_retries:
                     break
                 if cfg.retry_condition and not cfg.retry_condition(e, attempt):
+                    break
+                if cfg.retry_condition is None and not is_retryable_error(e):
                     break
                 delay = calculate_delay(attempt, cfg)
                 time.sleep(delay / 1000)
@@ -116,7 +117,10 @@ class Logger:
     def __init__(self, config: Optional[LoggerConfig] = None):
         self.config = config or DEFAULT_LOGGER_CONFIG
         self._logger = logging.getLogger('sdkwork')
-        self._logger.setLevel(getattr(logging, self.config.level.upper()))
+        level_name = self.config.level.upper()
+        if self.config.level == 'silent':
+            level_name = 'CRITICAL'
+        self._logger.setLevel(getattr(logging, level_name))
 
     def debug(self, message: str, **kwargs) -> None:
         self._logger.debug(self._format(message, kwargs))
@@ -142,7 +146,7 @@ def create_logger(config: Optional[LoggerConfig] = None) -> Logger:
 
 
 def noop_logger() -> Logger:
-    return Logger(LoggerConfig(level='silent'))
+    return create_logger(LoggerConfig(level='silent'))
 
 
 __all__ = [

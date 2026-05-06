@@ -8,7 +8,7 @@ export type QueryParamValue = QueryParamScalar | Array<string | number | boolean
 
 export type QueryParams = Record<string, QueryParamValue>;
 
-export interface HttpHeaders extends Record<string, string> {}
+export type HttpHeaders = Record<string, string>;
 
 export interface ApiResult<T = unknown> {
   code: number | string;

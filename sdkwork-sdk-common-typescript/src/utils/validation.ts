@@ -95,7 +95,7 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
   return proto === null || proto === Object.prototype;
 }
 
-export function isFunction(value: unknown): value is Function {
+export function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
   return typeof value === 'function';
 }
 
