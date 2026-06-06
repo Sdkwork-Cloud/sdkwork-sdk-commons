@@ -9,7 +9,7 @@ import type {
   UploadOptions,
   DownloadOptions,
 } from '../core/types';
-import { DEFAULT_TIMEOUT, SUCCESS_CODES, MIME_TYPES } from '../core/types';
+import { DEFAULT_TIMEOUT, SUCCESS_CODES, MIME_TYPES, HTTP_STATUS } from '../core/types';
 import {
   SdkError,
   NetworkError,
@@ -49,6 +49,15 @@ export interface UrlBuilder {
 
 export interface HeaderBuilder {
   build(config: RequestConfig, skipAuth?: boolean): HttpHeaders;
+}
+
+function isApiResultEnvelope<T>(value: unknown): value is ApiResult<T> {
+  return value !== null
+    && value !== undefined
+    && typeof value === 'object'
+    && !Array.isArray(value)
+    && 'code' in value
+    && ('data' in value || 'msg' in value || 'message' in value);
 }
 
 export abstract class BaseHttpClient implements RequestExecutor {
@@ -373,10 +382,23 @@ export abstract class BaseHttpClient implements RequestExecutor {
       await this.handleErrorResponse(response, config);
     }
 
+    if (response.status === HTTP_STATUS.NO_CONTENT) {
+      return undefined as T;
+    }
+
     const contentType = response.headers.get('content-type');
 
     if (contentType?.includes(MIME_TYPES.JSON)) {
-      const result: ApiResult<T> = await response.json();
+      const body = await response.text();
+      if (!body.trim()) {
+        return undefined as T;
+      }
+
+      const result: unknown = JSON.parse(body);
+
+      if (!isApiResultEnvelope<T>(result)) {
+        return result as T;
+      }
 
       if (!SUCCESS_CODES.includes(result.code) && !SUCCESS_CODES.includes(String(result.code))) {
         throw SdkError.fromApiResult(result, response.status);
