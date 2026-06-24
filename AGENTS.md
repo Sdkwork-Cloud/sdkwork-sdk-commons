@@ -34,6 +34,12 @@ No `sdkwork.app.config.json` is present at this root. If the task changes applic
 - `sdks/`: not present here; use only for SDK authority or generation surfaces.
 - Local directories to inspect first when relevant: `sdkwork-sdk-common-csharp/`, `sdkwork-sdk-common-flutter/`, `sdkwork-sdk-common-go/`, `sdkwork-sdk-common-java/`, `sdkwork-sdk-common-kt/`, `sdkwork-sdk-common-python/`, `sdkwork-sdk-common-swift/`, `sdkwork-sdk-common-typescript/`.
 
+## Documentation Canon
+
+- [docs/README.md](docs/README.md)
+- [docs/product/prd/PRD.md](docs/product/prd/PRD.md)
+- [docs/architecture/tech/TECH_ARCHITECTURE.md](docs/architecture/tech/TECH_ARCHITECTURE.md)
+
 ## Spec Resolution Order
 
 1. Read this `AGENTS.md` and any nearer component-level `AGENTS.md`.
