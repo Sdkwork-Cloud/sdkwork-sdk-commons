@@ -76,5 +76,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sdkwork/sdk-common-typescript.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

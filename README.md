@@ -1,4 +1,5 @@
 # SDKwork SDK Commons
+repository-kind: shared-package-family
 
 `sdkwork-sdk-commons` contains language-specific common packages used by generated SDKs.
 
