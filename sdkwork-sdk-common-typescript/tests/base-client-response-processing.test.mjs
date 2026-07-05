@@ -29,6 +29,22 @@ const server = createServer((request, response) => {
     return;
   }
 
+  if (request.url === '/enveloped-item-session') {
+    response.writeHead(200, { 'content-type': 'application/json' });
+    response.end(JSON.stringify({ code: 0, data: { item: rawSession }, traceId: 'trace-1' }));
+    return;
+  }
+
+  if (request.url === '/enveloped-list') {
+    response.writeHead(200, { 'content-type': 'application/json' });
+    response.end(JSON.stringify({
+      code: 0,
+      data: { items: [rawSession], pageInfo: { mode: 'offset', hasMore: false } },
+      traceId: 'trace-2',
+    }));
+    return;
+  }
+
   if (request.url === '/error-envelope') {
     response.writeHead(200, { 'content-type': 'application/json' });
     response.end(JSON.stringify({ code: '4000', msg: 'invalid credentials', data: null }));
@@ -65,6 +81,18 @@ try {
     await client.get('/enveloped-session'),
     rawSession,
     'standard SDKWork envelopes must still unwrap data',
+  );
+
+  assert.deepEqual(
+    await client.get('/enveloped-item-session'),
+    rawSession,
+    'sdkwork-v3 single-resource envelopes must unwrap data.item',
+  );
+
+  assert.deepEqual(
+    await client.get('/enveloped-list'),
+    { items: [rawSession], pageInfo: { mode: 'offset', hasMore: false } },
+    'sdkwork-v3 list envelopes must keep data.items and pageInfo',
   );
 
   await assert.rejects(
