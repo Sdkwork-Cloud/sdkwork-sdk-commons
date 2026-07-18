@@ -86,7 +86,7 @@ export {
   isRetryableError,
 } from './errors';
 
-export type { ErrorCode, ErrorDetail } from './errors';
+export type { ErrorCode, ErrorDetail, SdkProblemDetail } from './errors';
 
 export { BaseHttpClient, createBaseHttpClient } from './http';
 export type {

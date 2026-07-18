@@ -31,8 +31,22 @@ export interface ErrorDetail {
 export interface ErrorOptions {
   cause?: Error;
   details?: ErrorDetail[];
+  problem?: SdkProblemDetail;
   traceId?: string;
   metadata?: Record<string, unknown>;
+}
+
+export interface SdkProblemDetail {
+  type?: string;
+  title?: string;
+  status?: number;
+  code?: number | string;
+  detail?: string;
+  instance?: string;
+  operationId?: string;
+  i18nKey?: string;
+  locale?: string;
+  traceId?: string;
 }
 
 export class SdkError extends Error {
@@ -41,6 +55,7 @@ export class SdkError extends Error {
   public readonly details?: ErrorDetail[];
   public readonly timestamp: number;
   public readonly traceId?: string;
+  public readonly problem?: SdkProblemDetail;
   public readonly metadata?: Record<string, unknown>;
 
   constructor(
@@ -55,7 +70,8 @@ export class SdkError extends Error {
     this.httpStatus = httpStatus;
     this.details = options?.details;
     this.timestamp = Date.now();
-    this.traceId = options?.traceId;
+    this.traceId = options?.traceId ?? options?.problem?.traceId;
+    this.problem = options?.problem;
     this.metadata = options?.metadata;
     
     Object.setPrototypeOf(this, new.target.prototype);
@@ -92,38 +108,38 @@ export class SdkError extends Error {
     }
   }
 
-  static fromHttpStatus(status: number, message?: string): SdkError {
+  static fromHttpStatus(status: number, message?: string, options?: ErrorOptions): SdkError {
     const defaultMessage = message ?? `HTTP Error ${status}`;
     
     switch (status) {
       case HTTP_STATUS.BAD_REQUEST:
       case HTTP_STATUS.UNPROCESSABLE_ENTITY:
-        return new ValidationError(defaultMessage);
+        return new ValidationError(defaultMessage, undefined, options);
       case HTTP_STATUS.UNAUTHORIZED:
-        return new AuthenticationError(defaultMessage);
+        return new AuthenticationError(defaultMessage, options);
       case HTTP_STATUS.FORBIDDEN:
-        return new ForbiddenError(defaultMessage);
+        return new ForbiddenError(defaultMessage, options);
       case HTTP_STATUS.NOT_FOUND:
-        return new NotFoundError(defaultMessage);
+        return new NotFoundError(defaultMessage, options);
       case HTTP_STATUS.METHOD_NOT_ALLOWED:
-        return new ValidationError(defaultMessage);
+        return new ValidationError(defaultMessage, undefined, options);
       case HTTP_STATUS.CONFLICT:
-        return new ConflictError(defaultMessage);
+        return new ConflictError(defaultMessage, options);
       case HTTP_STATUS.TOO_MANY_REQUESTS:
-        return new RateLimitError(defaultMessage);
+        return new RateLimitError(defaultMessage, undefined, options);
       case HTTP_STATUS.INTERNAL_SERVER_ERROR:
-        return new ServerError(defaultMessage, status);
+        return new ServerError(defaultMessage, status, options);
       case HTTP_STATUS.BAD_GATEWAY:
-        return new BadGatewayError(defaultMessage);
+        return new BadGatewayError(defaultMessage, options);
       case HTTP_STATUS.SERVICE_UNAVAILABLE:
-        return new ServiceUnavailableError(defaultMessage);
+        return new ServiceUnavailableError(defaultMessage, options);
       case HTTP_STATUS.GATEWAY_TIMEOUT:
-        return new GatewayTimeoutError(defaultMessage);
+        return new GatewayTimeoutError(defaultMessage, options);
       default:
         if (status >= 500) {
-          return new ServerError(defaultMessage, status);
+          return new ServerError(defaultMessage, status, options);
         }
-        return new NetworkError(defaultMessage);
+        return new NetworkError(defaultMessage, options);
     }
   }
 
@@ -136,6 +152,7 @@ export class SdkError extends Error {
       details: this.details,
       timestamp: this.timestamp,
       traceId: this.traceId,
+      problem: this.problem,
       metadata: this.metadata,
     };
   }

@@ -376,15 +376,22 @@ export abstract class BaseHttpClient implements RequestExecutor {
 
   protected async handleErrorResponse(response: Response, config: RequestConfig): Promise<never> {
     let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    let problem: import('../errors').SdkProblemDetail | undefined;
 
     try {
-      const result = await response.json();
-      errorMessage = result.msg || result.message || errorMessage;
+      const result = await response.json() as Record<string, unknown>;
+      errorMessage = String(result.detail || result.msg || result.message || result.title || errorMessage);
+      if (
+        response.headers.get('content-type')?.includes('application/problem+json')
+        || ('status' in result && 'code' in result && 'traceId' in result)
+      ) {
+        problem = result as import('../errors').SdkProblemDetail;
+      }
     } catch {
       // Ignore JSON parse errors
     }
 
-    const error = SdkError.fromHttpStatus(response.status, errorMessage);
+    const error = SdkError.fromHttpStatus(response.status, errorMessage, { problem });
 
     await this.applyErrorInterceptors(error, config);
     throw error;
